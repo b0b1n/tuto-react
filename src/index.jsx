@@ -1,35 +1,21 @@
-import React, { useEffect, useState, useMemo, memo, useCallback } from "react";
+import React, { useRef } from "react";
 import { render } from "react-dom";
 
-function wait(duration) {
-  const t = Date.now();
-  while (true) {
-    return Date.now() - t > duration ?? true;
-  }
-}
-
-const Button = memo(function ({ onClick }) {
-  console.log("render");
-  return <button onClick={onClick}>Mon boutton</button>;
-});
-
 function App() {
-  const [count, setCount] = useState(0);
 
-  const handleClick = useCallback(function(){alert("Bonjour")}, [count]);
-  // const handleClick = useMemo(() => {
-  //   return (e) => {
-  //     alert("Bonjour");
-  //   };
+  const input = useRef(null)
+  const compteur = useRef({count : 0})
 
-  return (
-    <div>
-      <Button onClick={handleClick} />
-      <button onClick={() => setCount((c) => c + 1)}>
-        Incrémenter : {count}
-      </button>
-    </div>
-  );
+
+  const handleButtonClick = function(){
+    compteur.current.count++
+    console.log(compteur);
+  }
+
+  return <div className="m-5 ">
+    <input type="text" className="m-5" ref={input}/>
+    <button className="m-5 rounded ps-2 pe-2" onClick={handleButtonClick}>Récuperer la valeur </button>
+  </div>
 }
 
 render(<App />, document.getElementById("app"));
