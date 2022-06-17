@@ -1,41 +1,79 @@
-import React, { useReducer } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { render } from "react-dom";
 
-function init(initialValue){
-    return {count : initialValue}
+const FormContext = createContext({});
+
+function FormWithContext({ defaultValue, onSubmit, children }) {
+  const [data, setData] = useState(defaultValue);
+  const change = useCallback(function (name, value) {
+    setData((d) => ({ ...data, [name]: value }));
+  });
+  const value = useMemo(() => {
+    return { ...data, change };
+  }, [data, change]);
+
+  const handleSubmit = useCallback(function(e){
+    e.preventDefault()
+    onSubmit(value)
+  }, [onSubmit, value])
+  return (
+    <FormContext.Provider value={value}>
+      <form onSubmit={handleSubmit} className="mt-5">{children}</form>
+      {JSON.stringify(value)}
+    </FormContext.Provider>
+  );
 }
 
-function reducer(state, action) {
-  switch (action.type) {
-    case "increment":
-      return {count : state.count + (action.payload || 1)};
-    case "decrement":
-      return state.count <= 0 ? state : {count : state.count - (action.payload || 1)};
-    case "Reset":
-      return init(0)  
-
-    default:
-      throw new Error("L'action " + action.type + "est inconnue ");
-  }
-}
-function Child(){
-  console.log("rendering");
-  return <div>Hello</div>
-}
-function App() {
-
-  const [count , dispatch] = useReducer(reducer, 0, init)
-
+function FormField({ name, children }) {
+  const data = useContext(FormContext);
+  const handleChange = useCallback(
+    function (e) {
+      data.change(e.target.name, e.target.value);
+    },
+    [data.change]
+  );
 
   return (
-    <div className="m-5 ">
-      Compteur   :  {JSON.stringify(count)}
-      <button onClick={() => dispatch({type: 'increment' , payload : 10})}>Incrémenter</button>
-      <button onClick={() => dispatch({type: 'decrement'})}>Décrémenter</button>
-      <button onClick={() => dispatch({type: 'Reset'})}>Réinitialiser</button>
-      <Child />
+    <div className="form-group">
+      <label htmlFor={name}>{children}</label>
+      <input
+        type="text"
+        name={name}
+        id={name}
+        className="form-control"
+        value={data[name] || ""} 
+        onChange={handleChange}
+      />
     </div>
   );
 }
 
+function PrimaryButton({ children }) {
+  return <button className="btn btn-primary mt-3">{children}</button>;
+}
+
+function App() {
+  const handleSubmit = useCallback(function (value) {
+    console.log(value);
+  }, []);
+
+  return (
+    <div className="container">
+      <FormWithContext
+        defaultValue={{ name: "Doe", firstname: "John" }}
+        onSubmit={handleSubmit}
+      >
+        <FormField name="firstname">Prénom</FormField>
+        <FormField name="name">Nom</FormField>
+        <PrimaryButton>Envoyer</PrimaryButton>
+      </FormWithContext>
+    </div>
+  );
+}
 render(<App />, document.getElementById("app"));

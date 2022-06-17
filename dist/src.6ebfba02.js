@@ -33087,6 +33087,12 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -33099,65 +33105,85 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-function init(initialValue) {
-  return {
-    count: initialValue
-  };
+var FormContext = (0, _react.createContext)({});
+
+function FormWithContext(_ref) {
+  var defaultValue = _ref.defaultValue,
+      onSubmit = _ref.onSubmit,
+      children = _ref.children;
+
+  var _useState = (0, _react.useState)(defaultValue),
+      _useState2 = _slicedToArray(_useState, 2),
+      data = _useState2[0],
+      setData = _useState2[1];
+
+  var change = (0, _react.useCallback)(function (name, value) {
+    setData(function (d) {
+      return _objectSpread(_objectSpread({}, data), {}, _defineProperty({}, name, value));
+    });
+  });
+  var value = (0, _react.useMemo)(function () {
+    return _objectSpread(_objectSpread({}, data), {}, {
+      change: change
+    });
+  }, [data, change]);
+  var handleSubmit = (0, _react.useCallback)(function (e) {
+    e.preventDefault();
+    onSubmit(value);
+  }, [onSubmit, value]);
+  return /*#__PURE__*/_react.default.createElement(FormContext.Provider, {
+    value: value
+  }, /*#__PURE__*/_react.default.createElement("form", {
+    onSubmit: handleSubmit,
+    className: "mt-5"
+  }, children), JSON.stringify(value));
 }
 
-function reducer(state, action) {
-  switch (action.type) {
-    case "increment":
-      return {
-        count: state.count + (action.payload || 1)
-      };
-
-    case "decrement":
-      return state.count <= 0 ? state : {
-        count: state.count - (action.payload || 1)
-      };
-
-    case "Reset":
-      return init(0);
-
-    default:
-      throw new Error("L'action " + action.type + "est inconnue ");
-  }
+function FormField(_ref2) {
+  var name = _ref2.name,
+      children = _ref2.children;
+  var data = (0, _react.useContext)(FormContext);
+  var handleChange = (0, _react.useCallback)(function (e) {
+    data.change(e.target.name, e.target.value);
+  }, [data.change]);
+  return /*#__PURE__*/_react.default.createElement("div", {
+    className: "form-group"
+  }, /*#__PURE__*/_react.default.createElement("label", {
+    htmlFor: name
+  }, children), /*#__PURE__*/_react.default.createElement("input", {
+    type: "text",
+    name: name,
+    id: name,
+    className: "form-control",
+    value: data[name] || "",
+    onChange: handleChange
+  }));
 }
 
-function Child() {
-  console.log("rendering");
-  return /*#__PURE__*/_react.default.createElement("div", null, "Hello");
+function PrimaryButton(_ref3) {
+  var children = _ref3.children;
+  return /*#__PURE__*/_react.default.createElement("button", {
+    className: "btn btn-primary mt-3"
+  }, children);
 }
 
 function App() {
-  var _useReducer = (0, _react.useReducer)(reducer, 0, init),
-      _useReducer2 = _slicedToArray(_useReducer, 2),
-      count = _useReducer2[0],
-      dispatch = _useReducer2[1];
-
+  var handleSubmit = (0, _react.useCallback)(function (value) {
+    console.log(value);
+  }, []);
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: "m-5 "
-  }, "Compteur   :  ", JSON.stringify(count), /*#__PURE__*/_react.default.createElement("button", {
-    onClick: function onClick() {
-      return dispatch({
-        type: 'increment',
-        payload: 10
-      });
-    }
-  }, "Incr\xE9menter"), /*#__PURE__*/_react.default.createElement("button", {
-    onClick: function onClick() {
-      return dispatch({
-        type: 'decrement'
-      });
-    }
-  }, "D\xE9cr\xE9menter"), /*#__PURE__*/_react.default.createElement("button", {
-    onClick: function onClick() {
-      return dispatch({
-        type: 'Reset'
-      });
-    }
-  }, "R\xE9initialiser"), /*#__PURE__*/_react.default.createElement(Child, null));
+    className: "container"
+  }, /*#__PURE__*/_react.default.createElement(FormWithContext, {
+    defaultValue: {
+      name: "Doe",
+      firstname: "John"
+    },
+    onSubmit: handleSubmit
+  }, /*#__PURE__*/_react.default.createElement(FormField, {
+    name: "firstname"
+  }, "Pr\xE9nom"), /*#__PURE__*/_react.default.createElement(FormField, {
+    name: "name"
+  }, "Nom"), /*#__PURE__*/_react.default.createElement(PrimaryButton, null, "Envoyer")));
 }
 
 (0, _reactDom.render)( /*#__PURE__*/_react.default.createElement(App, null), document.getElementById("app"));
@@ -33189,7 +33215,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50153" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62437" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
