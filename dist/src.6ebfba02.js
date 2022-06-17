@@ -33099,38 +33099,65 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-function wait(duration) {
-  var t = Date.now();
+function init(initialValue) {
+  return {
+    count: initialValue
+  };
+}
 
-  while (true) {
-    var _ref;
+function reducer(state, action) {
+  switch (action.type) {
+    case "increment":
+      return {
+        count: state.count + (action.payload || 1)
+      };
 
-    return (_ref = Date.now() - t > duration) !== null && _ref !== void 0 ? _ref : true;
+    case "decrement":
+      return state.count <= 0 ? state : {
+        count: state.count - (action.payload || 1)
+      };
+
+    case "Reset":
+      return init(0);
+
+    default:
+      throw new Error("L'action " + action.type + "est inconnue ");
   }
 }
 
-function App() {
-  var _useState = (0, _react.useState)(0),
-      _useState2 = _slicedToArray(_useState, 2),
-      count = _useState2[0],
-      setCount = _useState2[1];
+function Child() {
+  console.log("rendering");
+  return /*#__PURE__*/_react.default.createElement("div", null, "Hello");
+}
 
-  var button = (0, _react.useRef)(null);
-  var increment = (0, _react.useCallback)(function () {
-    return setCount(function (c) {
-      return c + 1;
-    });
-  }, []);
-  (0, _react.useLayoutEffect)(function () {
-    button.current.style.color = count % 2 === 0 ? 'red' : 'green';
-  }, [count]);
+function App() {
+  var _useReducer = (0, _react.useReducer)(reducer, 0, init),
+      _useReducer2 = _slicedToArray(_useReducer, 2),
+      count = _useReducer2[0],
+      dispatch = _useReducer2[1];
+
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "m-5 "
-  }, /*#__PURE__*/_react.default.createElement("button", {
-    onClick: increment,
-    ref: button,
-    className: "btn btn-light border-primary"
-  }, "Incr\xE9menter ", count, " "));
+  }, "Compteur   :  ", JSON.stringify(count), /*#__PURE__*/_react.default.createElement("button", {
+    onClick: function onClick() {
+      return dispatch({
+        type: 'increment',
+        payload: 10
+      });
+    }
+  }, "Incr\xE9menter"), /*#__PURE__*/_react.default.createElement("button", {
+    onClick: function onClick() {
+      return dispatch({
+        type: 'decrement'
+      });
+    }
+  }, "D\xE9cr\xE9menter"), /*#__PURE__*/_react.default.createElement("button", {
+    onClick: function onClick() {
+      return dispatch({
+        type: 'Reset'
+      });
+    }
+  }, "R\xE9initialiser"), /*#__PURE__*/_react.default.createElement(Child, null));
 }
 
 (0, _reactDom.render)( /*#__PURE__*/_react.default.createElement(App, null), document.getElementById("app"));
@@ -33162,7 +33189,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65220" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50153" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
