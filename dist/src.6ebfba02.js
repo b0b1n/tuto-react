@@ -33120,12 +33120,30 @@ function Compteur() {
       count = _useIncrement2[0],
       increment = _useIncrement2[1];
 
-  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement("button", {
+  (0, _react.useEffect)(function () {
+    var timer = window.setInterval(function () {
+      increment();
+    }, 1000);
+    return function () {
+      clearInterval(timer);
+    };
+  }, []);
+  (0, _react.useEffect)(function () {
+    document.title = "Compteur" + count;
+  }, [count]);
+  return /*#__PURE__*/_react.default.createElement("button", {
     onClick: increment
-  }, "Incr\xE9menter ", count));
+  }, "Incr\xE9menter ", count);
 }
 
-(0, _reactDom.render)( /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(Compteur, null)), document.getElementById("app"));
+(0, _reactDom.render)( /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(Compteur, null)), document.getElementById("app")); // window.setTimeout(()=>{
+//   render(
+//     <div>
+//       bonjour
+//     </div>,
+//     document.getElementById("app")
+//   );
+// }, 2000)
 },{"react":"node_modules/react/index.js","react-dom":"node_modules/react-dom/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -33154,7 +33172,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52712" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55413" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

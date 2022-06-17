@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { render } from "react-dom";
 
 const useIncrement = (initial, step)=>{
@@ -11,11 +11,22 @@ const useIncrement = (initial, step)=>{
 
 function Compteur() {
   const [count, increment] = useIncrement(0,2);
-  return (
-    <>
-      <button onClick={increment}>Incrémenter {count}</button>
-    </>
-  );
+
+  useEffect(()=>{
+    const timer= window.setInterval(()=>{
+      increment()
+    }, 1000)
+    return function(){
+      clearInterval(timer)
+    }
+  }, [])
+
+  useEffect(()=>{
+    document.title = "Compteur" + count 
+  }, [count])
+
+
+  return <button onClick={increment}>Incrémenter {count}</button>
 }
 render(
   <div>
@@ -23,3 +34,12 @@ render(
   </div>,
   document.getElementById("app")
 );
+
+// window.setTimeout(()=>{
+//   render(
+//     <div>
+//       bonjour
+//     </div>,
+//     document.getElementById("app")
+//   );
+// }, 2000)
