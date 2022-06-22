@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
+import PropTypes from "prop-types"
 
-function Modal({ onClose }) {
-  throw new Error();
+function Modal({ onClose, children }) {
+  // throw new Error();
   return createPortal(
     <>
       <div
@@ -27,7 +28,7 @@ function Modal({ onClose }) {
               </button>
             </div>
             <div className="modal-body">
-              <p>Modal body test goes here</p>
+              <p>{children}</p>
             </div>
             <div className="modal-footer">
               <button
@@ -44,10 +45,9 @@ function Modal({ onClose }) {
         <div className="modal-backdrop fade show"></div>
       </div>
     </>,
-    document.body
+    document.getElementById("modal")
   );
 }
-
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -67,6 +67,24 @@ class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
+Modal.propTypes ={
+  onClose : PropTypes.func.isRequired,
+  children : PropTypes.node.isRequired
+}
+
+
+Modal.defaultProps = {
+  children : "123456789"
+}
+
+function Double({n}){
+  return `Le double de ${n} est est ${n + n}`
+}
+
+Double.propTypes = {
+  n: PropTypes.number.isRequired
+}
 function App() {
   const [modal, setModal] = useState(false);
 
@@ -78,7 +96,7 @@ function App() {
   };
 
   const style = {
-    transform: "translateY(1px)",
+    // transform: "translateY(1px)",
   };
 
   const log = function () {
@@ -91,6 +109,9 @@ function App() {
         <p>
           Some quick example text to build on the card title and make up the
           bulk of the card's content
+        </p>
+        <p>
+          <Double n={1} />
         </p>
         <button onClick={showModal} className="btn btn-primary">
           Go somewhere
